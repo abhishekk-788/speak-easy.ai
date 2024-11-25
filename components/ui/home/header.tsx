@@ -46,7 +46,7 @@ const Header = () => {
       <div className="flex lg:justify-end lg:flex-1">
         <div className="flex gap-2 items-center">
           <SignedIn>
-            <NavLink href="/">Upload a Video</NavLink>
+            <NavLink href="/dashboard">Upload a Video</NavLink>
             <div className="mx-10">
               <UserButton />
             </div>
