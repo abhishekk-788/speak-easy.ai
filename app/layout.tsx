@@ -5,6 +5,7 @@ import Header from "@/components/ui/home/header";
 import {
   ClerkProvider,
 } from "@clerk/nextjs";
+import { Toaster } from "@/components/ui/toaster";
 
 const fontSans = IBM_Plex_Sans({
   subsets: ["latin"],
@@ -12,7 +13,7 @@ const fontSans = IBM_Plex_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "speakeasy.ai",
+  title: "SpeakEasy.AI",
   description: "SpeakEasy.AI is a transcription service for your videos.",
 };
 
@@ -27,6 +28,7 @@ export default function RootLayout({
         <body className={fontSans.className}>
           <Header />
           <main>{children}</main>
+          <Toaster/>
         </body>
       </html>
     </ClerkProvider>

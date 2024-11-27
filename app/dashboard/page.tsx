@@ -1,6 +1,7 @@
 import BgGradient from "@/components/common/bg-gradient";
 import { Badge } from "@/components/ui/badge";
 import UpgradeYourPlan from "@/components/upload/upgrade-your-plan";
+import UploadForm from "@/components/upload/upload-form";
 import getDbConnection from "@/lib/db";
 import {
   doesUserExist,
@@ -28,7 +29,7 @@ export default async function Dashboard() {
 
   const hasUserCancelled = await hasCancelledSubscription(sql, email);
   console.log(hasUserCancelled);
-
+  
   const user = await doesUserExist(sql, email);
 
   if (user) {
@@ -80,7 +81,9 @@ export default async function Dashboard() {
           )}
 
           {isValidBasicPlan || isProPlan ? (
-            <h1>Upload Form</h1>
+            <BgGradient>
+              <UploadForm />
+            </BgGradient>
           ) : (
             <UpgradeYourPlan />
           )}
