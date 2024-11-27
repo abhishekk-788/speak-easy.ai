@@ -6,6 +6,7 @@ import {
   ClerkProvider,
 } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/toaster";
+import { ORIGIN_URL } from "@/lib/constants";
 
 const fontSans = IBM_Plex_Sans({
   subsets: ["latin"],
@@ -15,6 +16,10 @@ const fontSans = IBM_Plex_Sans({
 export const metadata: Metadata = {
   title: "SpeakEasy.AI",
   description: "SpeakEasy.AI is a transcription service for your videos.",
+  metadataBase: new URL(ORIGIN_URL),
+  alternates: {
+    canonical: ORIGIN_URL,
+  }
 };
 
 export default function RootLayout({
