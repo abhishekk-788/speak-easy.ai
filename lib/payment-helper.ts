@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use server"
 import Stripe from "stripe";
 import getDbConnection from "./db";
+import { currentUser } from "@clerk/nextjs/server";
+import { getPlanType } from "./user-helper";
 
 export async function handleSubscriptionDeleted({
   subscriptionId,
@@ -35,7 +38,10 @@ export async function handleCheckoutSessionCompleted({
   session: Stripe.Checkout.Session;
   stripe: Stripe;
 }) {
-  console.log("Handle Checkout Session Started");
+  const clerkUser = await currentUser();
+  const userId = clerkUser?.id;
+  console.log("Handle Checkout Session Started for user: " + clerkUser?.id);
+
   const customerId = session.customer as string;
   console.log("Customer ID:", customerId);
 
@@ -50,11 +56,46 @@ export async function handleCheckoutSessionCompleted({
 
   if ("email" in customer && priceId) {
     console.log("Customer email and price ID are valid");
-    await createOrUpdateUser(sql, customer, customerId);
+    await createOrUpdateUser(sql, customer, customerId, userId);
     await updateUserSubscription(sql, priceId, customer.email as string);
     await insertPayment(sql, session, priceId, customer.email as string);
   } else {
     console.log("Customer email or price ID is invalid");
+  }
+}
+
+export async function checkUserSubscription() {
+  console.log("checkUserSubscription called");
+
+  const clerkUser = await currentUser();
+  console.log("clerkUser:", clerkUser);
+
+  const email = clerkUser?.emailAddresses?.[0].emailAddress ?? "";
+  console.log("email:", email);
+
+  try {
+    const sql = await getDbConnection();
+    if (email) {
+      const user = await sql`SELECT * FROM users WHERE email=${email}`;
+      console.log("SQL query result:", user);
+
+      if (user.length == 0) {
+        console.log("No user found, returning 'starter'");
+        return "starter" as string;
+      } else {
+        console.log("Fetch from users DB", user);
+        const planType = getPlanType(user[0].price_id);
+        console.log("planType:", planType);
+        return planType.id;
+      }
+    }
+  } catch (error) {
+    console.error("Error checking user subscription:", error);
+    console.log({
+      title:
+        "An error occurred while checking your subscription. Please try again.",
+    });
+    return null;
   }
 }
 
@@ -76,14 +117,15 @@ async function insertPayment(
 async function createOrUpdateUser(
   sql: any,
   customer: Stripe.Customer,
-  customerId: string
+  customerId: string,
+  userId: string | undefined
 ) {
   try {
     console.log("Checking if user exists with email:", customer.email);
     const user = await sql`SELECT * FROM users WHERE email = ${customer.email}`;
     if (user.length === 0) {
       console.log("User does not exist, creating new user");
-      await sql`INSERT INTO users (email, full_name, customer_id) VALUES (${customer.email}, ${customer.name}, ${customerId})`;
+      await sql`INSERT INTO users (email, full_name, customer_id, user_id) VALUES (${customer.email}, ${customer.name}, ${customerId}, ${userId})`;
       console.log("User created successfully");
     } else {
       console.log("User already exists");

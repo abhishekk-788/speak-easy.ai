@@ -1,10 +1,25 @@
+"use client"
+import { useState, useEffect } from "react";
 import { ArrowRight, CheckIcon } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "../button";
-import { plansMap } from "@/lib/constants";
+import { ORIGIN_URL, plansMap } from "@/lib/constants";
+import { checkUserSubscription } from "@/lib/payment-helper";
 
 export default function Pricing() {
+  const [userPlan, setUserPlan] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Fetch the current user's subscription plan
+    const fetchSubscription = async () => {
+      const plan = await checkUserSubscription();
+      setUserPlan(plan as string | null);
+    };
+
+    fetchSubscription();
+  }, []);
+
   return (
     <section className="relative overflow-hidden" id="pricing">
       <div className="py-12 lg:py-24 max-w-5xl mx-auto px-12 lg:px-0">
@@ -13,14 +28,16 @@ export default function Pricing() {
             Pricing
           </h2>
         </div>
-        <div className="relative flex justify-center flex-col lg:flex-row items-center lg:items-stretch gap-8">
+        <div className={cn(
+          "relative flex justify-center flex-col lg:flex-row items-center lg:items-stretch gap-8"
+        )}>
           {plansMap.map(
             ({ name, price, description, items, id, paymentLink }, idx) => (
               <div className="relative w-full max-w-lg" key={idx}>
                 <div
                   className={cn(
                     "relative flex flex-col h-full gap-4 lg:gap-8 z-10 p-8 rounded-box border-[1px] border-gray-500/20 rounded-2xl",
-                    id === "pro" && "border-violet-500 gap-5 border-2"
+                    id === userPlan && "border-violet-500 gap-5 border-2 bg-purple-50" // Apply style if this is the user's current plan
                   )}
                 >
                   <div className="flex justify-between items-center gap-4">
@@ -45,7 +62,7 @@ export default function Pricing() {
                   <ul className="space-y-2.5 leading-relaxed text-base flex-1">
                     {items.map((item, idx) => (
                       <li className="flex items-center gap-2" key={idx}>
-                        <CheckIcon size={18}></CheckIcon>
+                        <CheckIcon size={18} />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -57,9 +74,14 @@ export default function Pricing() {
                         "border-2 rounded-full flex gap-2 bg-black text-gray-100",
                         id === "pro" && "border-amber-300 px-4"
                       )}
+                      disabled={(id === userPlan)}
                     >
                       <Link
-                        href={paymentLink}
+                        href={`${paymentLink}?success_url=${encodeURIComponent(
+                          `${ORIGIN_URL}/?status=success`
+                        )}&cancel_url=${encodeURIComponent(
+                          `${ORIGIN_URL}/?status=cancel`
+                        )}`}
                         className="flex gap-1 items-center"
                       >
                         Get SpeakEasy <ArrowRight size={18} />
