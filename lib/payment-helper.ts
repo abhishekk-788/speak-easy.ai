@@ -121,7 +121,7 @@ async function createOrUpdateUser(
   userId: string | undefined
 ) {
   try {
-    console.log("Checking if user exists with email:", customer.email);
+    console.log("Checking if user exists with email:", customer.email, userId);
     const user = await sql`SELECT * FROM users WHERE email = ${customer.email}`;
     if (user.length === 0) {
       console.log("User does not exist, creating new user");

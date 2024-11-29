@@ -13,8 +13,8 @@ export async function POST(req: NextRequest) {
   const payload = await req.text();
   const sig = req.headers.get("stripe-signature");
 
-  console.log("Received payload:", payload);
-  console.log("Received signature:", sig);
+  // console.log("Received payload:", payload);
+  // console.log("Received signature:", sig);
 
   let event;
   try {

@@ -1,14 +1,16 @@
+"use client"
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { Ghost } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 
 const NavLink = ({
   href,
   children,
 }: {
   href: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) => {
   return (
     <Link
@@ -22,6 +24,10 @@ const NavLink = ({
 };
 
 const Header = () => {
+  const pathname = usePathname(); // Get the current path
+  const isPostsPage = pathname === "/posts";
+  const isDashboardPage = pathname === "/dashboard";
+
   return (
     <nav
       className="container flex items-center 
@@ -38,7 +44,7 @@ const Header = () => {
         </NavLink>
       </div>
       <div className="flex lg:justify-center gap-2 lg:gap-12 lg:items-center">
-        <NavLink href="#pricing">Pricing</NavLink>
+        {!isPostsPage && !isDashboardPage && <NavLink href="#pricing">Pricing</NavLink>}
         <SignedIn>
           <NavLink href="/posts">Your Posts</NavLink>
         </SignedIn>

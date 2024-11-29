@@ -28,16 +28,19 @@ export default function Pricing() {
             Pricing
           </h2>
         </div>
-        <div className={cn(
-          "relative flex justify-center flex-col lg:flex-row items-center lg:items-stretch gap-8"
-        )}>
+        <div
+          className={cn(
+            "relative flex justify-center flex-col lg:flex-row items-center lg:items-stretch gap-8"
+          )}
+        >
           {plansMap.map(
             ({ name, price, description, items, id, paymentLink }, idx) => (
               <div className="relative w-full max-w-lg" key={idx}>
                 <div
                   className={cn(
                     "relative flex flex-col h-full gap-4 lg:gap-8 z-10 p-8 rounded-box border-[1px] border-gray-500/20 rounded-2xl",
-                    id === userPlan && "border-violet-500 gap-5 border-2 bg-purple-50" // Apply style if this is the user's current plan
+                    id === userPlan &&
+                      "border-violet-500 gap-5 border-2 bg-purple-50" // Apply style if this is the user's current plan
                   )}
                 >
                   <div className="flex justify-between items-center gap-4">
@@ -68,25 +71,32 @@ export default function Pricing() {
                     ))}
                   </ul>
                   <div className="space-y-2">
-                    <Button
-                      variant={"link"}
-                      className={cn(
-                        "border-2 rounded-full flex gap-2 bg-black text-gray-100",
-                        id === "pro" && "border-amber-300 px-4"
-                      )}
-                      disabled={(id === userPlan)}
-                    >
-                      <Link
-                        href={`${paymentLink}?success_url=${encodeURIComponent(
-                          `${ORIGIN_URL}/?status=success`
-                        )}&cancel_url=${encodeURIComponent(
-                          `${ORIGIN_URL}/?status=cancel`
-                        )}`}
-                        className="flex gap-1 items-center"
+                    {id !== userPlan && (
+                      <Button
+                        variant={"link"}
+                        className={cn(
+                          "border-2 rounded-full flex gap-2 bg-black text-gray-100",
+                          id === "pro" && "border-amber-300 px-4"
+                        )}
+                        disabled={id === userPlan}
                       >
-                        Get SpeakEasy <ArrowRight size={18} />
-                      </Link>
-                    </Button>
+                        <Link
+                          href={`${paymentLink}?success_url=${encodeURIComponent(
+                            `${ORIGIN_URL}/?status=success`
+                          )}&cancel_url=${encodeURIComponent(
+                            `${ORIGIN_URL}/?status=cancel`
+                          )}`}
+                          className="flex gap-1 items-center"
+                        >
+                          Get SpeakEasy <ArrowRight size={18} />
+                        </Link>
+                      </Button>
+                    )}
+                    {id === userPlan && (
+                      <p className="text-sm text-green-600 font-medium px-4 py-2 rounded-md bg-green-50 border border-green-200">
+                        You are currently subscribed to this plan 🎉
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
