@@ -180,7 +180,7 @@ Here's the transcription to convert: ${transcriptions}`,
     ],
     model: "gpt-4o-mini",
     temperature: 0.7,
-    max_tokens: 1000,
+    max_completion_tokens: 2000,
   });
 
   return completion.choices[0].message.content;

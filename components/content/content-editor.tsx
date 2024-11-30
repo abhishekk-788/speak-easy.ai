@@ -1,20 +1,19 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useActionState, useCallback, useState } from "react";
 import BgGradient from "../common/bg-gradient";
-import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { updatePostAction } from "@/actions/edit-actions";
 import { Button } from "../ui/button";
 import { Download, Edit2, Loader2 } from "lucide-react";
-import { ForwardRefEditor } from "./forwar-ref-editor";
-import { useFormStatus } from "react-dom";
+import MarkdownEditor from "./markdown-editor";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <Button
       type="submit"
-      className="w-40 bg-gradient-to-r from-purple-900 to-indigo-600 hover:from-purple-600 hover:to-indigo-900 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform transition duration-200 ease-in-out hover:scale-105 focus:outline-none focus:ring-2"
+      className={`w-40 bg-gradient-to-r from-purple-900 to-indigo-600 hover:from-purple-600 hover:to-indigo-900 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform transition duration-200 ease-in-out hover:scale-105 focus:outline-none focus:ring-2`}
       disabled={pending}
     >
       {pending ? (
@@ -50,6 +49,7 @@ export default function ContentEditor({
   posts: Array<{ content: string; title: string; id: string }>;
 }) {
   const [content, setContent] = useState(posts[0].content);
+  const [, setIsChanged] = useState(false);
 
   const updatedPostActionWithId = updatePostAction.bind(null, {
     postId: posts[0].id,
@@ -62,9 +62,8 @@ export default function ContentEditor({
   );
 
   const handleContentChange = (value: string) => {
-    if (content !== value) {
-      setContent(value);
-    }
+    setContent(value);
+    setIsChanged(true);
   };
 
   const handleExport = useCallback(() => {
@@ -102,11 +101,10 @@ export default function ContentEditor({
         </div>
       </div>
       <BgGradient className="opacity-20">
-        <ForwardRefEditor
-          markdown={posts[0].content}
-          className="markdown-content border-dotted border-gray-200 border-2 p-4 rounded-md animate-in ease-in-out duration-75"
+        <MarkdownEditor
+          initialContent={content}
           onChange={handleContentChange}
-        ></ForwardRefEditor>
+        />
       </BgGradient>
     </form>
   );
